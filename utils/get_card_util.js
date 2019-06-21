@@ -52,7 +52,7 @@ function getCard(message) {
     }
     return null;
   }))
-    .then(compileCardMessages);
+    .then((messageList) => compileCardMessages('Cards displayed', messageList));
 }
 
 module.exports = getCard;

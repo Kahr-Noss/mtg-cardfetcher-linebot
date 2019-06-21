@@ -2,7 +2,7 @@ const request = require('request-promise');
 const querystring = require("querystring");
 const fs = require('fs');
 
-const  {getCardMessage, compileCardMessages} = require('./create-card-message');
+const { getCardMessage, compileCardMessages } = require('./create-card-message');
 
 function getLastSpoilers(set) {
   if (!set) {
@@ -31,9 +31,9 @@ function getLastSpoilers(set) {
       }
       // save the new last card ID
       fs.writeFileSync('./data/spoilers.json', JSON.stringify({ ...spoilerData, last_card_id: setData.data[0].id }, null, 2));
-      
+
       // send the subarray of the new cards spoiled since last chack
-      return compileCardMessages( setData.data.slice(0, lastIndex)
+      return compileCardMessages('New spoilers!', setData.data.slice(0, lastIndex)
         .map((card) => getCardMessage(card, true)));
     });
 }

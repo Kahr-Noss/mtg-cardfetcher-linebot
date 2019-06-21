@@ -1,3 +1,5 @@
+const request = require('request-promise');
+
 function createCardObject(card, showText) {
   return {
     type: 'bubble',
@@ -55,27 +57,47 @@ function createCardObject(card, showText) {
 }
 
 function getCardMessage(card, showText) {
-  if (card.card_faces) {
-    return card.card_faces.map((c) => createCardObject(c, showText));
-  }
-  return [createCardObject(card, showText)];
+  let cardList = [];
+  return Promise.resolve()
+    .then(() => {
+      // get the two faces of the card if it's a double faced card
+      if (card.card_faces) {
+        return card.card_faces.map((c) => createCardObject(c, showText));
+      } else {
+        return [createCardObject(card, showText)];
+      }
+    })
+    .then((cards) => {
+      cardList = [...cards];
+      // if there are related cards, send them
+      if (!card.all_parts) {
+        return [];
+      }
+      return Promise.all(card.all_parts
+        // remove present card, tokens and emblems from the list
+        .filter((c) => c.id !== card.id && c.component !== 'token' && !c.type_line.match(/^Emblem/))
+        .map((c) => request.get(c.uri).then((relatedCardJSON) => createCardObject(JSON.parse(relatedCardJSON), showText))))
+    })
+    .then((relatedCards) => {
+      return [...cardList, ...relatedCards];
+    });
 }
 
-function compileCardMessages(messageList) {
+function compileCardMessages(text, messageList) {
   return messageList.reduce((buffer, messages) => [...buffer, ...(messages || [])], [])
-  .reduce((buffer, msg) => {
-    if (buffer[buffer.length - 1].length === 10) {
-      return [...buffer, [msg]];
-    }
-    return [...buffer.slice(0, -1), [...buffer[buffer.length - 1], msg]]
-  }, [[]]).map((msgPack) => ({
-    type: 'flex',
-    altText: 'Cards displayed',
-    contents: {
-      type: 'carousel',
-      contents: msgPack
-    }
-  }))
+    .reduce((buffer, msg) => {
+      if (buffer[buffer.length - 1].length === 10) {
+        return [...buffer, [msg]];
+      }
+      return [...buffer.slice(0, -1), [...buffer[buffer.length - 1], msg]]
+    }, [[]]).map((msgPack) => ({
+      type: 'flex',
+      altText: text,
+      contents: {
+        type: 'carousel',
+        contents: msgPack
+      }
+    }))
 }
 
-module.exports = {getCardMessage, compileCardMessages};
+module.exports = { getCardMessage, compileCardMessages };
