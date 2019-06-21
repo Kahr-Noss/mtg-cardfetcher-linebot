@@ -1,0 +1,33 @@
+{
+  "name": "mtg-cardfetcher-linebot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server-model.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Kahr-Noss/mtg-cardfetcher-linebot.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Kahr-Noss/mtg-cardfetcher-linebot/issues"
+  },
+  "homepage": "https://github.com/Kahr-Noss/mtg-cardfetcher-linebot#readme",
+  "dependencies": {
+    "@line/bot-sdk": "^6.1.0",
+    "body-parser": "^1.18.3",
+    "botbuilder": "^3.15.0",
+    "botbuilder-line": "0.0.2",
+    "dotenv": "^6.2.0",
+    "express": "^4.16.3",
+    "https": "^1.0.0",
+    "linebot": "^1.5.1",
+    "node-cron": "^2.0.3",
+    "querystring": "^0.2.0",
+    "request-promise": "^4.2.4"
+  }
+}
