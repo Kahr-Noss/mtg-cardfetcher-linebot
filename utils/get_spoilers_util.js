@@ -33,8 +33,10 @@ function getLastSpoilers(set) {
       fs.writeFileSync('./data/spoilers.json', JSON.stringify({ ...spoilerData, last_card_id: setData.data[0].id }, null, 2));
 
       // send the subarray of the new cards spoiled since last chack
-      return compileCardMessages('New spoilers!', setData.data.slice(0, lastIndex)
-        .map((card) => getCardMessage(card, true)));
+      return Promise.all(setData.data.slice(0, lastIndex).map((card) => getCardMessage(card, true)));
+    })
+    .then((cardList) => {
+      return compileCardMessages('New spoilers!', cardList);
     });
 }
 

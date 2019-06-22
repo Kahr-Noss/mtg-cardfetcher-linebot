@@ -83,8 +83,19 @@ function getCardMessage(card, showText) {
     });
 }
 
-function compileCardMessages(text, messageList) {
-  return messageList.reduce((buffer, messages) => [...buffer, ...(messages || [])], [])
+function compileCardMessages(text, cardList, showText) {
+  const cardURLList = [];
+  // spread all the related cards as single cards
+  return cardList.reduce((buffer, cards) => [...buffer, ...(cards || [])], [])
+    // remove duplicates
+    .filter((c) => {
+      if (cardURLList.indexOf(c.hero.url) === -1) {
+        cardURLList.push(c.hero.url);
+        return true;
+      }
+      return false;
+    })
+    // split the cards by chunk of 10 (max carousel size)
     .reduce((buffer, msg) => {
       if (buffer[buffer.length - 1].length === 10) {
         return [...buffer, [msg]];

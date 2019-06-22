@@ -33,8 +33,7 @@ function getCard(message) {
           const search = {
             q: `"${name.trim()}" ${set ? `set:${set}` : ''}`,
             include_multilingual: true,
-            format: 'json',
-            set: 'alpha'
+            format: 'json'
           };
           return request.get(`https://api.scryfall.com/cards/search?${querystring.stringify(search)}`)
             .then((resultJSON) => {
@@ -52,7 +51,7 @@ function getCard(message) {
     }
     return null;
   }))
-    .then((messageList) => compileCardMessages('Cards displayed', messageList));
+    .then((cardList) => compileCardMessages('Cards displayed', cardList));
 }
 
 module.exports = getCard;

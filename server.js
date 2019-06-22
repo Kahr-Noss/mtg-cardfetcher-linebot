@@ -60,11 +60,24 @@ app.post('/webhook', linebotParser);
 
 if (process.env.ENVIRONMENT === 'test') {
   app.listen(3000, () => {
-    getCardUtil('((ajani tyrant))')
-      .then((answer) => {
-        console.log(JSON.stringify(answer, null, 2));
-        bot.push(process.env.TEST_LINE_ID, answer);
-      })
+    // getCardUtil('((sol ring)) ((anneau solaire)) ((sol ring@alpha))')
+    //   .then((answer) => {
+    //     console.log(JSON.stringify(answer, null, 2));
+    //     bot.push(process.env.TEST_LINE_ID, answer);
+    //   });
+
+    // getSpoilersUtil('m20')
+    //   .then((messageList) => {
+    //     if (process.env.ENVIRONMENT === 'production') {
+    //       bot.broadcast(messageList);
+    //     }
+    //     if (process.env.ENVIRONMENT === 'test') {
+    //       bot.push(process.env.TEST_LINE_ID, messageList);
+    //     }
+    //   })
+    //   .catch((err) => {
+    //     console.log(err);
+    //   });
   });
 }
 if (process.env.ENVIRONMENT === 'production') {
