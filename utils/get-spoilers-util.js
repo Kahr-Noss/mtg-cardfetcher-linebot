@@ -6,6 +6,9 @@ const { getCardMessage, compileCardMessages } = require('./create-card-message')
 
 function getLastSpoilers() {
   const data = JSON.parse(fs.readFileSync('./data/spoilers.json'));
+  if (!data.set){
+    return Promise.reject('No set currently spoiled');
+  }
   const search = {
     q: `set:${data.set}`,
     format: 'json',

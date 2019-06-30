@@ -1,14 +1,14 @@
 {
   "daily": {
-    "friends": 3,
+    "friends": 0,
     "groups": 0,
-    "calls": 0,
-    "matchs": 0
+    "calls": 2,
+    "matchs": 1
   },
   "general": {
-    "friends": 3,
-    "groups": 0,
-    "calls": 0,
-    "matchs": 0
+    "friends": 16,
+    "groups": 2,
+    "calls": 2,
+    "matchs": 1
   }
 }

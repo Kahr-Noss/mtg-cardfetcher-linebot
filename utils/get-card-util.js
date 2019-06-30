@@ -1,7 +1,8 @@
 const request = require('request-promise');
 const querystring = require("querystring");
 
-const  {getCardMessage, compileCardMessages} = require('./create-card-message');
+const { getCardMessage, compileCardMessages } = require('./create-card-message');
+const { saveStats } = require('./save-stats');
 
 
 function getCard(message) {
@@ -10,6 +11,8 @@ function getCard(message) {
   if (!nameList) {
     return Promise.reject('No pattern detected');
   }
+  saveStats('calls', nameList.length);
+
   return Promise.all(nameList.map((card) => {
     const cardCleaned = card.replace(/(\(|\))/g, '').trim();
 
@@ -25,6 +28,7 @@ function getCard(message) {
       };
       return request.get(`https://api.scryfall.com/cards/named?${querystring.stringify(search)}`)
         .then((cardDataJSON) => {
+          saveStats('matchs', 1);
           return getCardMessage(JSON.parse(cardDataJSON), false);
         })
         .catch((err) => {
@@ -39,6 +43,7 @@ function getCard(message) {
             .then((resultJSON) => {
               const result = JSON.parse(resultJSON);
               if (result.total_cards === 1) {
+                saveStats('matchs', 1);
                 return getCardMessage(JSON.parse(result.data[0]), true);
               }
               throw new Error(`${result.total_cards} cards found in another language`);

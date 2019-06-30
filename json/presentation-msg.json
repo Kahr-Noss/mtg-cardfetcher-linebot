@@ -1,0 +1,305 @@
+{
+  "type": "flex",
+  "altText": "hello",
+  "contents": {
+    "type": "carousel",
+    "contents": [
+      {
+        "type": "bubble",
+        "header": {
+          "type": "box",
+          "layout": "horizontal",
+          "contents": [
+            {
+              "type": "text",
+              "text": "Hello! I'm a MtG bot.",
+              "wrap": true,
+              "margin": "none",
+              "size": "xl",
+              "align": "center",
+              "weight": "bold"
+            }
+          ]
+        },
+        "hero": {
+          "type": "image",
+          "size": "full",
+          "aspectRatio": "1:1",
+          "url": "https://aicollo.kahr-noss.com/img/pres-1.jpg",
+          "backgroundColor": "#728bb2"
+        },
+        "body": {
+          "type": "box",
+          "layout": "horizontal",
+          "contents": [
+            {
+              "type": "text",
+              "text": "I'm here to facilitate your conversations about Magic the Gathering. Add me to your group chat and I'll show everyone the cards you are talking about. No more need to copy paste the card by yourself.",
+              "wrap": true,
+              "margin": "none"
+            }
+          ]
+        }
+      },
+      {
+        "type": "bubble",
+        "header": {
+          "type": "box",
+          "layout": "horizontal",
+          "contents": [
+            {
+              "type": "text",
+              "text": "Easy to use.",
+              "wrap": true,
+              "margin": "none",
+              "size": "xl",
+              "align": "center",
+              "weight": "bold"
+            }
+          ]
+        },
+        "hero": {
+          "type": "image",
+          "size": "full",
+          "aspectRatio": "1:1",
+          "url": "https://aicollo.kahr-noss.com/img/pres-2.jpg",
+          "backgroundColor": "#728bb2"
+        },
+        "body": {
+          "type": "box",
+          "layout": "horizontal",
+          "contents": [
+            {
+              "type": "text",
+              "text": "To call me, just write the card's name in double parenthesis like this: \n\n((sol ring))",
+              "wrap": true,
+              "margin": "none"
+            }
+          ]
+        }
+      },
+      {
+        "type": "bubble",
+        "header": {
+          "type": "box",
+          "layout": "horizontal",
+          "contents": [
+            {
+              "type": "text",
+              "text": "Choose your version.",
+              "wrap": true,
+              "margin": "none",
+              "size": "xl",
+              "align": "center",
+              "weight": "bold"
+            }
+          ]
+        },
+        "hero": {
+          "type": "image",
+          "size": "full",
+          "aspectRatio": "1:1",
+          "url": "https://aicollo.kahr-noss.com/img/pres-3.jpg",
+          "backgroundColor": "#728bb2"
+        },
+        "body": {
+          "type": "box",
+          "layout": "horizontal",
+          "contents": [
+            {
+              "type": "text",
+              "text": "Want to show the art of a card from a particular set? Just specify it after a @ (preferably with the 3 character code):\n\n((sol ring @ alpha))",
+              "wrap": true,
+              "margin": "none"
+            }
+          ]
+        }
+      },
+      {
+        "type": "bubble",
+        "header": {
+          "type": "box",
+          "layout": "horizontal",
+          "contents": [
+            {
+              "type": "text",
+              "text": "I work in English",
+              "wrap": true,
+              "margin": "none",
+              "size": "xl",
+              "align": "center",
+              "weight": "bold"
+            }
+          ]
+        },
+        "hero": {
+          "type": "image",
+          "size": "full",
+          "aspectRatio": "1:1",
+          "url": "https://aicollo.kahr-noss.com/img/pres-4.jpg",
+          "backgroundColor": "#728bb2"
+        },
+        "body": {
+          "type": "box",
+          "layout": "horizontal",
+          "contents": [
+            {
+              "type": "text",
+              "text": "I'm working the best in English, I can even find a card from an uncomplete name as long as it's not ambiguous:\n\n((Atraxa))",
+              "wrap": true,
+              "margin": "none"
+            }
+          ]
+        }
+      },
+      {
+        "type": "bubble",
+        "header": {
+          "type": "box",
+          "layout": "horizontal",
+          "contents": [
+            {
+              "type": "text",
+              "text": "I support any language",
+              "wrap": true,
+              "margin": "none",
+              "size": "xl",
+              "align": "center",
+              "weight": "bold"
+            }
+          ]
+        },
+        "hero": {
+          "type": "image",
+          "size": "full",
+          "aspectRatio": "1:1",
+          "url": "https://aicollo.kahr-noss.com/img/pres-5.jpg",
+          "backgroundColor": "#728bb2"
+        },
+        "body": {
+          "type": "box",
+          "layout": "horizontal",
+          "contents": [
+            {
+              "type": "text",
+              "text": "You can input the card name in any other language, but it has to be the exact one:\n\n((太陽の指輪))",
+              "wrap": true,
+              "margin": "none"
+            }
+          ]
+        }
+      },
+      {
+        "type": "bubble",
+        "header": {
+          "type": "box",
+          "layout": "horizontal",
+          "contents": [
+            {
+              "type": "text",
+              "text": "Multiple searches",
+              "wrap": true,
+              "margin": "none",
+              "size": "xl",
+              "align": "center",
+              "weight": "bold"
+            }
+          ]
+        },
+        "hero": {
+          "type": "image",
+          "size": "full",
+          "aspectRatio": "1:1",
+          "url": "https://aicollo.kahr-noss.com/img/pres-6.jpg",
+          "backgroundColor": "#728bb2"
+        },
+        "body": {
+          "type": "box",
+          "layout": "horizontal",
+          "contents": [
+            {
+              "type": "text",
+              "text": "When calling the bot, you can mix it in a sentence and even do multiple calls in one message:\n\n\"Did you see the combo with ((kiki jiki)) and ((zealous conscripts)) ? That's nuts.\"",
+              "wrap": true,
+              "margin": "none"
+            }
+          ]
+        }
+      },
+      {
+        "type": "bubble",
+        "header": {
+          "type": "box",
+          "layout": "horizontal",
+          "contents": [
+            {
+              "type": "text",
+              "text": "Only one match",
+              "wrap": true,
+              "margin": "none",
+              "size": "xl",
+              "align": "center",
+              "weight": "bold"
+            }
+          ]
+        },
+        "hero": {
+          "type": "image",
+          "size": "full",
+          "aspectRatio": "1:1",
+          "url": "https://aicollo.kahr-noss.com/img/pres-7.jpg",
+          "backgroundColor": "#728bb2"
+        },
+        "body": {
+          "type": "box",
+          "layout": "horizontal",
+          "contents": [
+            {
+              "type": "text",
+              "text": "When asking me for a card, I'll only answer if I found a unique card. If I match more than one or none, I'll not answer.",
+              "wrap": true,
+              "margin": "none"
+            }
+          ]
+        }
+      },
+      {
+        "type": "bubble",
+        "header": {
+          "type": "box",
+          "layout": "horizontal",
+          "contents": [
+            {
+              "type": "text",
+              "text": "Spoilers notifications",
+              "wrap": true,
+              "margin": "none",
+              "size": "xl",
+              "align": "center",
+              "weight": "bold"
+            }
+          ]
+        },
+        "hero": {
+          "type": "image",
+          "size": "full",
+          "aspectRatio": "1:1",
+          "url": "https://aicollo.kahr-noss.com/img/pres-8.jpg",
+          "backgroundColor": "#728bb2"
+        },
+        "body": {
+          "type": "box",
+          "layout": "horizontal",
+          "contents": [
+            {
+              "type": "text",
+              "text": "If you add me as a friend, I'll send you notifications as new cards from the next set are revealed.\nI'll also send the transcript in English so you can read it even if the card is in a foreign language.",
+              "wrap": true,
+              "margin": "none"
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

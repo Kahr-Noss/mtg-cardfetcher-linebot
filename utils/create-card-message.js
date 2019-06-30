@@ -101,14 +101,15 @@ function compileCardMessages(text, cardList, showText) {
         return [...buffer, [msg]];
       }
       return [...buffer.slice(0, -1), [...buffer[buffer.length - 1], msg]]
-    }, [[]]).map((msgPack) => ({
+    }, [[]])
+    .map((msgPack) => ({
       type: 'flex',
       altText: text,
       contents: {
         type: 'carousel',
         contents: msgPack
       }
-    }))
+    }));
 }
 
 module.exports = { getCardMessage, compileCardMessages };
