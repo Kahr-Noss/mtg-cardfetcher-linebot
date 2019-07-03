@@ -72,6 +72,7 @@ cron.schedule('0 0 * * *', () => {
   New groups: ${data.daily.groups} (${data.general.groups})
   calls: ${data.daily.calls} (${data.general.calls})
   matchs: ${data.daily.matchs} (${data.general.matchs})`;
+  bot.push(process.env.TEST_LINE_ID, msg);
 
   resetDaily();
 });
