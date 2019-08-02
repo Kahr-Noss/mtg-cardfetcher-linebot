@@ -46,7 +46,7 @@ bot.on('join', function (event) {
 });
 
 // check the spoilers every 5 min
-cron.schedule('*/5 * * * *', () => {
+cron.schedule('0 8 * * *', () => {
   console.log('Checking new spoilers...')
   getSpoilersUtil()
     .then((messageList) => {

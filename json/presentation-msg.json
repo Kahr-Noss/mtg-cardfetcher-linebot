@@ -293,7 +293,7 @@
           "contents": [
             {
               "type": "text",
-              "text": "If you add me as a friend, I'll send you notifications as new cards from the next set are revealed.\nI'll also send the transcript in English so you can read it even if the card is in a foreign language.",
+              "text": "If you add me as a friend, I'll send you notifications every morning with the new revealed cards from the next set.\nI'll also send the transcript in English so you can read it even if the card is in a foreign language.",
               "wrap": true,
               "margin": "none"
             }

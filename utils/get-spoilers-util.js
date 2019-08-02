@@ -21,9 +21,6 @@ function getLastSpoilers() {
 
       // get the index of the last announced spoiled card
       const lastIndex = setData.data.findIndex((card) => card.id === data.last_card_id);
-      if (lastIndex === -1) {
-        return Promise.reject('last card not found');
-      }
       if (lastIndex === 0) {
         return Promise.reject('No new card published');
       }
@@ -32,7 +29,10 @@ function getLastSpoilers() {
         set: data.set,
         last_card_id: setData.data[0].id
       }, null, 2));
-
+      
+      if (lastIndex === -1) {
+      return Promise.all(setData.data.map((card) => getCardMessage(card, true)));
+      }
       // send the subarray of the new cards spoiled since last chack
       return Promise.all(setData.data.slice(0, lastIndex).map((card) => getCardMessage(card, true)));
     })
