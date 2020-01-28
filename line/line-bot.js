@@ -70,7 +70,9 @@ const client = new line.Client(lineConfig);
 //   resetDaily();
 // });
 function handleEvent(event){
+  console.log(event);
   if (event.type !== 'message' || event.message.type !== 'text') {
+    console.log('PLOP SKIP THIS SHIT')
     // ignore non-text-message event
     return Promise.resolve(null);
   }
@@ -85,7 +87,11 @@ function handleEvent(event){
 function lineBot(req,res){
   Promise
   .all(req.body.events.map(handleEvent))
-  .then((result) => res.json(result));
+  .then((result) => res.json(result))
+  .catch((err) => {
+    console.log(err);
+    res.json({});
+  });
 }
 
 module.exports = lineBot;
