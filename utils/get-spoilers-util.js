@@ -2,7 +2,7 @@ const request = require('request-promise');
 const querystring = require("querystring");
 const fs = require('fs');
 
-const { getCardMessage, compileCardMessages } = require('./create-card-message');
+const { getCardMessage, compileCardMessages } = require('../line/create-card-message');
 
 function getLastSpoilers() {
   const data = JSON.parse(fs.readFileSync('./data/spoilers.json'));

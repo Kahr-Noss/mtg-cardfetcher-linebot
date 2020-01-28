@@ -1,7 +1,7 @@
 const request = require('request-promise');
 const querystring = require("querystring");
 
-const { getCardMessage, compileCardMessages } = require('./create-card-message');
+const { getCardMessage, compileCardMessages } = require('../line/create-card-message');
 const { saveStats } = require('./save-stats');
 
 

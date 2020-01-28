@@ -18,7 +18,7 @@
   },
   "homepage": "https://github.com/Kahr-Noss/mtg-cardfetcher-linebot#readme",
   "dependencies": {
-    "@line/bot-sdk": "^6.1.0",
+    "@line/bot-sdk": "^6.8.4",
     "body-parser": "^1.18.3",
     "botbuilder": "^3.15.0",
     "botbuilder-line": "0.0.2",
