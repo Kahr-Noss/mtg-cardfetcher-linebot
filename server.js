@@ -79,7 +79,7 @@ cron.schedule('0 0 * * *', () => {
 
 
 const linebotParser = bot.parser();
-app.post('/webhook', linebotParser);
+app.post('/line/webhook', linebotParser);
 
 
 if (process.env.ENVIRONMENT === 'test') {
