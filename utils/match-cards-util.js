@@ -1,13 +1,36 @@
 const request = require('request-promise');
 const querystring = require("querystring");
 
-const { getCardMessage, compileCardMessages } = require('../line/create-card-message');
 const { saveStats } = require('./save-stats');
 
+function parseCardObject(card) {
+      // get the two faces of the card if it's a double faced card
+      const cardFacesList = card.card_faces ? card.card_faces.filter((c) => c.image_uris) : [];
+      const cardList =[...(cardFacesList.length > 0 ? cardFacesList :[card])];
 
-function getCard(message) {
+      // if there are related cards, send them
+ return Promise.all((card.all_parts || [])
+  // remove present card, tokens and emblems from the list
+    .filter((c) => c.id !== card.id && c.component !== 'token' && !c.type_line.match(/^Emblem/))
+    .map((c) => request.get(c.uri).then((relatedCardJSON) => JSON.parse(relatedCardJSON)))
+    )
+    .then((relatedCards) =>{
+    return  [...cardList, ...relatedCards].map((c) => ({
+      imageUrl:c.image_uris.normal,
+      name:c.name,
+      mana_cost:c.mana_cost,
+      type_line:c.type_line,
+      oracle_text:c.oracle_text,
+      power:c.power,
+      toughness:c.toughness,
+      loyalty:c.loyalty,          
+  }))});
+}
+
+
+function matchCards(message) {
   // check if the card name pattern has been inputed  (( card name ))
-  const nameList = message.match(/\(\([^\)]*\)\)/g);
+  const nameList = message.match(/\(\([^\)]+\)\)/g);
   if (!nameList) {
     return Promise.reject('No pattern detected');
   }
@@ -29,7 +52,7 @@ function getCard(message) {
       return request.get(`https://api.scryfall.com/cards/named?${querystring.stringify(search)}`)
         .then((cardDataJSON) => {
           saveStats('matchs', 1);
-          return getCardMessage(JSON.parse(cardDataJSON), false);
+          return parseCardObject(JSON.parse(cardDataJSON));
         })
         .catch((err) => {
           console.log(`${name} => No unique card found, trying other languages`);
@@ -44,19 +67,30 @@ function getCard(message) {
               const result = JSON.parse(resultJSON);
               if (result.total_cards === 1) {
                 saveStats('matchs', 1);
-                return getCardMessage(JSON.parse(result.data[0]), true);
+                return parseCardObject(JSON.parse(result.data[0]));
               }
               throw new Error(`${result.total_cards} cards found in another language`);
             })
             .catch((err) => {
               console.log('No unique card found in another language');
-              return null;
+              return [];
             });
         });
     }
-    return null;
+    return [];
   }))
-    .then((cardList) => compileCardMessages('Cards displayed', cardList));
+  .then((CardArrayList) => {
+  const cardURLList = [];
+        return CardArrayList.reduce((buffer, cardArray) => [...buffer, ...cardArray], [])
+    // remove duplicates
+    .filter((c) => {
+      if (cardURLList.indexOf(c.imageUrl) === -1) {
+        cardURLList.push(c.imageUrl);
+        return true;
+      }
+      return false;
+    })
+  });
 }
 
-module.exports = getCard;
+module.exports = matchCards;

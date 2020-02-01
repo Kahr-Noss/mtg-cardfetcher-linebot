@@ -2,6 +2,7 @@ const express = require("express");
 const path = require("path");
 const axios = require('axios');
 // const {  FacebookMessagingAPIClient,  FacebookMessageParser,  ValidateWebhook} = require("fb-messenger-bot-api");
+const matchCardsUtil = require("../utils/match-cards-util");
 
 const router = express.Router();
 // const messagingClient = new FacebookMessagingAPIClient(
@@ -48,36 +49,42 @@ const verifyWebhook = (req, res) => {
 };
 
 const getMessage = (req, res) => {
-console.log('new message');
-console.log(JSON.stringify(req.body,null,2));
+const event = req.body.entry[0].messaging[0];
+const senderId = event.sender.id;
+const message = event.message.text;
 
-const senderId = req.body.entry[0].messaging[0].sender.id;
-console.log(senderId)
+if(!message) {
+  return res.sendStatus(200);
+}
 
-
-axios.post(`https://graph.facebook.com/v2.6/me/messages?access_token=${process.env.PAGE_ACCESS_TOKEN}` ,{
-  "recipient":{
-    "id":senderId
-  },
-  "message":{
-    "attachment":{
-      "type":"image", 
-      "payload":{
-        "url":"https://img.scryfall.com/cards/large/front/a/4/a4227afa-780b-4755-9b61-46255717c6be.jpg?1579203420", 
-        "is_reusable":true
+return matchCardsUtil(message)
+.then((cardList) => {
+ return cardList.reduce((promiseChain, card) => {
+  return promiseChain
+  .then(() => axios.post(`https://graph.facebook.com/v2.6/me/messages?access_token=${process.env.PAGE_ACCESS_TOKEN}` ,{
+      "recipient":{
+        "id":senderId
+      },
+      "message":{
+        "attachment":{
+          "type":"image", 
+          "payload":{
+            "url":card.imageUrl, 
+            "is_reusable":true
+          }
+        }
       }
-    }
-  }
-
+    })
+  )
+  }, Promise.resolve())
 })
 .then(() => {
   res.sendStatus(200);
 })
-    .catch((err) => {
-      console.log(err);
-      return res.sendStatus(200);
-    });
-
+.catch((err) => {
+  console.log(err);
+  return res.sendStatus(200);
+});
 };
 
 router.get("/webhook", verifyWebhook);

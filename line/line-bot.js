@@ -2,10 +2,11 @@ const fs = require("fs");
 const line = require("@line/bot-sdk");
 const cron = require("node-cron");
 
-const getCardsUtil = require("../utils/get-card-util");
+const matchCardsUtil = require("../utils/match-cards-util");
 const getSpoilersUtil = require("../utils/get-spoilers-util");
 const { saveStats, resetDaily } = require("../utils/save-stats");
-
+const compileCardMessages = require('./compile-messages');
+const createMessage = require('./create-card-message');
 const lineConfig = {
   channelId: process.env.CHANNEL_ID,
   channelSecret: process.env.CHANNEL_SECRET,
@@ -23,7 +24,13 @@ function handleEvent(event) {
     }
 
     // the event is a text message
-    return getCardsUtil(event.message.text)
+    return matchCardsUtil(event.message.text)
+      .then((cardList) => {
+        if(cardList.length === 0){
+          throw new Error('No card matched');
+        }
+        return compileCardMessages('Cards displayed', cardList.map((card) => createMessage(card, false) ));
+      })
       .then((answer) => {
         console.log(JSON.stringify(answer, null, 2));
         return client.replyMessage(event.replyToken, answer);
