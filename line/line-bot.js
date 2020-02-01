@@ -1,10 +1,10 @@
+const fs = require("fs");
+const line = require("@line/bot-sdk");
+const cron = require("node-cron");
 
-const line = require('@line/bot-sdk');
-const cron = require('node-cron');
-
-const getCardUtil = require('../utils/get-card-util');
-const getSpoilersUtil = require('../utils/get-spoilers-util');
-const { saveStats, resetDaily } = require('../utils/save-stats');
+const getCardsUtil = require("../utils/get-card-util");
+const getSpoilersUtil = require("../utils/get-spoilers-util");
+const { saveStats, resetDaily } = require("../utils/save-stats");
 
 const lineConfig = {
   channelId: process.env.CHANNEL_ID,
@@ -14,84 +14,80 @@ const lineConfig = {
 
 const client = new line.Client(lineConfig);
 
-// bot.on('message', function (event) {
-//   const message = event.message.text;
-//   if (message) {
-//     getCardUtil(message)
-//       .then((answer) => {
-//         console.log(JSON.stringify(answer, null, 2));
-//         event.reply(answer);
-//       })
-//       .catch((err) => {
-//         console.log(err);
-//       });
-//   }
-// });
+function handleEvent(event) {
+  if (event.type === "message" && event.message.type === "text") {
+    // test webhook from line
+    if (event.replyToken === "00000000000000000000000000000000") {
+      console.log("webhook test");
+      return Promise.resolve(null);
+    }
 
-// bot.on('follow', function (event) {
-//   event.reply(JSON.parse(fs.readFileSync('./json/presentation-msg.json')));
-//   saveStats('friends', 1);
-// });
-
-// bot.on('join', function (event) {
-//   event.reply(JSON.parse(fs.readFileSync('./json/presentation-msg.json')));
-//   saveStats('groups', 1);
-// });
-
-// // check the spoilers every 5 min
-// cron.schedule('0 8 * * *', () => {
-//   console.log('Checking new spoilers...')
-//   getSpoilersUtil()
-//     .then((messageList) => {
-//       console.log(messageList);
-//       if (process.env.ENVIRONMENT === 'production') {
-//         bot.broadcast(messageList);
-//       }
-//       if (process.env.ENVIRONMENT === 'test') {
-//         bot.push(process.env.TEST_LINE_ID, messageList);
-//       }
-//     })
-//     .catch((err) => {
-//       console.log(err);
-//     });
-// });
-
-
-// // send stats every morning and reset stats
-// cron.schedule('0 0 * * *', () => {
-//   const data = JSON.parse(fs.readFileSync('./data/stats.json'));
-//   const msg = `Here are today stats:
-//   New friends: ${data.daily.friends} (${data.general.friends})
-//   New groups: ${data.daily.groups} (${data.general.groups})
-//   calls: ${data.daily.calls} (${data.general.calls})
-//   matchs: ${data.daily.matchs} (${data.general.matchs})`;
-//   bot.push(process.env.TEST_LINE_ID, msg);
-
-//   resetDaily();
-// });
-function handleEvent(event){
-  console.log(event);
-  if (event.type !== 'message' || event.message.type !== 'text') {
-    console.log('PLOP SKIP THIS SHIT')
-    // ignore non-text-message event
-    return Promise.resolve(null);
+    // the event is a text message
+    return getCardsUtil(event.message.text)
+      .then((answer) => {
+        console.log(JSON.stringify(answer, null, 2));
+        return client.replyMessage(event.replyToken, answer);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   }
 
-  // create a echoing text message
-  const echo = { type: 'text', text: event.message.text };
+  if (event.type === "follow") {
+    saveStats("friends", 1);
+    return client.replyMessage(event.replyToken, JSON.parse(fs.readFileSync("./json/presentation-msg.json")));
+  }
 
-  // use reply API
-  return client.replyMessage(event.replyToken, echo);
+  if (event.type === "join") {
+    saveStats("groups", 1);
+    return client.replyMessage(event.replyToken, JSON.parse(fs.readFileSync("./json/presentation-msg.json")));
+  }
+
+  // ignore non-text-message event
+  return Promise.resolve(null);
 }
 
-function lineBot(req,res){
-  Promise
-  .all(req.body.events.map(handleEvent))
-  .then((result) => res.json(result))
-  .catch((err) => {
-    console.log(err);
-    res.json({});
-  });
+
+
+// check the spoilers every 5 min
+cron.schedule('0 8 * * *', () => {
+  console.log('Checking new spoilers...')
+  getSpoilersUtil()
+    .then((messageList) => {
+      if(messageList.length === 0){
+        return null;
+      }
+      if (process.env.ENVIRONMENT === 'production') {
+        return client.broadcast(messageList);
+      }
+      if (process.env.ENVIRONMENT === 'test') {
+        return client.pushMessage(process.env.TEST_LINE_ID, messageList);
+      }
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+});
+
+// send stats every morning and reset stats
+cron.schedule('0 0 * * 0', () => {
+  const data = JSON.parse(fs.readFileSync('./data/stats.json'));
+  const msg = `Here are today stats:
+  New friends: ${data.daily.friends} (${data.general.friends})
+  New groups: ${data.daily.groups} (${data.general.groups})
+  calls: ${data.daily.calls} (${data.general.calls})
+  matchs: ${data.daily.matchs} (${data.general.matchs})`;
+  console.log('sending msg')
+  client.pushMessage(process.env.TEST_LINE_ID, {type:'text', text:msg})
+  .catch(console.log)
+
+  resetDaily();
+});
+
+function lineBot(req, res) {
+  Promise.all(req.body.events.map(handleEvent))
+    .then(result => res.json(result))
+    .catch(console.log);
 }
 
 module.exports = lineBot;

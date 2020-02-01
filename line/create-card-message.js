@@ -1,6 +1,10 @@
 const request = require('request-promise');
 
 function createCardObject(card, showText) {
+  if(!card.image_uris){
+
+    console.log(card);
+  }
   return {
     type: 'bubble',
     hero: {
@@ -61,8 +65,9 @@ function getCardMessage(card, showText) {
   return Promise.resolve()
     .then(() => {
       // get the two faces of the card if it's a double faced card
-      if (card.card_faces) {
-        return card.card_faces.map((c) => createCardObject(c, showText));
+      const cardFacesList = card.card_faces ? card.card_faces.filter((c) => c.image_uris) : [];
+      if (cardFacesList.length > 0) {        
+        return cardFacesList.map((c) => createCardObject(c, showText));
       } else {
         return [createCardObject(card, showText)];
       }

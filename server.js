@@ -4,6 +4,8 @@ const path = require('path');
 const lineMiddleware = require('@line/bot-sdk').middleware
 const https = require('https');
 const fs = require('fs');
+const messengerCtlr = require('./messenger/messenger-ctlr')
+const bodyParser = require('body-parser');
 
 const lineBot = require('./line/line-bot');
 
@@ -18,6 +20,9 @@ const lineConfig = {
 };
 
 app.post('/line/webhook', lineMiddleware(lineConfig), lineBot);
+
+app.use(bodyParser.json())
+app.use('/messenger', messengerCtlr);
 
 
 if (process.env.ENVIRONMENT === 'test') {
@@ -42,6 +47,7 @@ if (process.env.ENVIRONMENT === 'test') {
     //   .catch((err) => {
     //     console.log(err);
     //   });
+    console.log('test server started');
   });
 }
 if (process.env.ENVIRONMENT === 'production') {
@@ -51,6 +57,6 @@ if (process.env.ENVIRONMENT === 'production') {
   };
   const server = https.createServer(options, app);
   server.listen(8443, () => {
-    console.log('server started');
+    console.log('prod server started');
   });
 }
