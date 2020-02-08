@@ -1,85 +1,28 @@
-const path = require('path');
-const linebot = require('linebot');
+require('dotenv').config();
 const express = require('express');
+const path = require('path');
+const lineMiddleware = require('@line/bot-sdk').middleware
 const https = require('https');
 const fs = require('fs');
-const cron = require('node-cron');
+const messengerCtlr = require('./messenger/messenger-ctlr')
+const bodyParser = require('body-parser');
 
-const getCardUtil = require('./utils/get-card-util');
-const getSpoilersUtil = require('./utils/get-spoilers-util');
-const { saveStats, resetDaily } = require('./utils/save-stats');
+const lineBot = require('./line/line-bot');
 
-require('dotenv').config();
 const app = express();
 
 app.use(express.static(path.join(__dirname, 'public')));
 
-const bot = linebot({
+const lineConfig = {
   channelId: process.env.CHANNEL_ID,
   channelSecret: process.env.CHANNEL_SECRET,
   channelAccessToken: process.env.CHANNEL_ACCESS_TOKEN
-});
+};
 
+app.post('/line/webhook', lineMiddleware(lineConfig), lineBot);
 
-bot.on('message', function (event) {
-  const message = event.message.text;
-  if (message) {
-    getCardUtil(message)
-      .then((answer) => {
-        console.log(JSON.stringify(answer, null, 2));
-        event.reply(answer);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }
-});
-
-bot.on('follow', function (event) {
-  event.reply(JSON.parse(fs.readFileSync('./json/presentation-msg.json')));
-  saveStats('friends', 1);
-});
-
-bot.on('join', function (event) {
-  event.reply(JSON.parse(fs.readFileSync('./json/presentation-msg.json')));
-  saveStats('groups', 1);
-});
-
-// check the spoilers every 5 min
-cron.schedule('0 8 * * *', () => {
-  console.log('Checking new spoilers...')
-  getSpoilersUtil()
-    .then((messageList) => {
-      console.log(messageList);
-      if (process.env.ENVIRONMENT === 'production') {
-        bot.broadcast(messageList);
-      }
-      if (process.env.ENVIRONMENT === 'test') {
-        bot.push(process.env.TEST_LINE_ID, messageList);
-      }
-    })
-    .catch((err) => {
-      console.log(err);
-    });
-});
-
-
-// send stats every morning and reset stats
-cron.schedule('0 0 * * *', () => {
-  const data = JSON.parse(fs.readFileSync('./data/stats.json'));
-  const msg = `Here are today stats:
-  New friends: ${data.daily.friends} (${data.general.friends})
-  New groups: ${data.daily.groups} (${data.general.groups})
-  calls: ${data.daily.calls} (${data.general.calls})
-  matchs: ${data.daily.matchs} (${data.general.matchs})`;
-  bot.push(process.env.TEST_LINE_ID, msg);
-
-  resetDaily();
-});
-
-
-const linebotParser = bot.parser();
-app.post('/line/webhook', linebotParser);
+app.use(bodyParser.json())
+app.use('/messenger', messengerCtlr);
 
 
 if (process.env.ENVIRONMENT === 'test') {
@@ -104,6 +47,7 @@ if (process.env.ENVIRONMENT === 'test') {
     //   .catch((err) => {
     //     console.log(err);
     //   });
+    console.log('test server started');
   });
 }
 if (process.env.ENVIRONMENT === 'production') {
@@ -113,6 +57,6 @@ if (process.env.ENVIRONMENT === 'production') {
   };
   const server = https.createServer(options, app);
   server.listen(8443, () => {
-    console.log('server started');
+    console.log('prod server started');
   });
 }
