@@ -22,7 +22,6 @@ function parseCardObject(card) {
       power: c.power,
       toughness: c.toughness,
       loyalty: c.loyalty,
-      relatedCards: c.name === card.name ? null : card.name,
     })));
 }
 
