@@ -1,11 +1,11 @@
 require('dotenv').config();
 const express = require('express');
 const path = require('path');
-const lineMiddleware = require('@line/bot-sdk').middleware
+const lineMiddleware = require('@line/bot-sdk').middleware;
 const https = require('https');
 const fs = require('fs');
-const messengerCtlr = require('./messenger/messenger-ctlr')
 const bodyParser = require('body-parser');
+const messengerCtlr = require('./messenger/messenger-ctlr');
 
 const lineBot = require('./line/line-bot');
 
@@ -16,12 +16,12 @@ app.use(express.static(path.join(__dirname, 'public')));
 const lineConfig = {
   channelId: process.env.CHANNEL_ID,
   channelSecret: process.env.CHANNEL_SECRET,
-  channelAccessToken: process.env.CHANNEL_ACCESS_TOKEN
+  channelAccessToken: process.env.CHANNEL_ACCESS_TOKEN,
 };
 
 app.post('/line/webhook', lineMiddleware(lineConfig), lineBot);
 
-app.use(bodyParser.json())
+app.use(bodyParser.json());
 app.use('/messenger', messengerCtlr);
 
 
@@ -53,7 +53,7 @@ if (process.env.ENVIRONMENT === 'test') {
 if (process.env.ENVIRONMENT === 'production') {
   const options = {
     key: fs.readFileSync('encryption/privkey.pem', 'utf8'),
-    cert: fs.readFileSync('encryption/fullchain.pem', 'utf8')
+    cert: fs.readFileSync('encryption/fullchain.pem', 'utf8'),
   };
   const server = https.createServer(options, app);
   server.listen(8443, () => {

@@ -25,6 +25,26 @@ function parseCardObject(card) {
     })));
 }
 
+function getFrameVersionOfCard(card, options) {
+  // if no frame specified return default
+  if (!options.frame && !options.fullart) {
+    return card;
+  }
+  // if a frame has been specified, try to query that frame specifically
+  const search = {
+    q: `!"${card.name}" unique:cards ${options.set ? `set:${options.set}` : ''} ${options.frame ? `frame:${options.frame}` : ''} ${options.fullart ? 'is:fullart' : ''}`,
+    format: 'json',
+  };
+
+  return request.get(`https://api.scryfall.com/cards/search?${querystring.stringify(search)}`)
+    .then((resultJSON) => {
+      const result = JSON.parse(resultJSON);
+      if (result.total_cards !== 0) {
+        return result.data[0];
+      }
+      throw new Error('No card found with this frame');
+    });
+}
 
 function matchCards(message) {
   // check if the card name pattern has been inputed  (( card name ))
@@ -38,25 +58,47 @@ function matchCards(message) {
     const cardCleaned = card.replace(/(\(|\))/g, '').trim();
 
     // check if an extension is specified
-    const [match, name, set] = /^([^@]*)@?(.*)?$/.exec(cardCleaned);
-    console.log(`${name}  (${set})`);
+    const [match, name, params] = /^([^@]*)@?(.*)?$/.exec(cardCleaned);
+
+    // check if a frame is specified
+    const options = {
+      set: params,
+    };
+
+    if (params && params.match(/showcase/i)) {
+      options.frame = 'showcase';
+      options.set = options.set.replace('showcase', '').trim();
+    }
+    if (params && params.match(/(extended|extended\s*art)/i)) {
+      options.frame = 'extendedart';
+      options.set = options.set.replace(/(extended|extended\s*art)/i, '').trim();
+    }
+    if (params && params.match(/(fullart|full\s*art)/i)) {
+      options.fullart = true;
+      options.set = options.set.replace(/(fullart|full\s*art)/i, '').trim();
+    }
+
+    console.log(`${name}  (${options.set})   ver. ${options.frame || 'classic'}`);
 
     if (name) {
       const search = {
         fuzzy: name.trim(),
         format: 'json',
-        set: set ? set.trim() : '',
+        set: options.set ? options.set.trim() : '',
       };
       return request.get(`https://api.scryfall.com/cards/named?${querystring.stringify(search)}`)
         .then((cardDataJSON) => {
           saveStats('matchs', 1);
-          return parseCardObject(JSON.parse(cardDataJSON));
+          return getFrameVersionOfCard(JSON.parse(cardDataJSON), options);
         })
-        .catch(() => {
+        .then((cardData) => parseCardObject(cardData))
+        .catch((err) => {
+          console.log(err);
+
           console.log(`${name} => No unique card found, trying other languages`);
           // if nothing matched in english, try other languages
           const search2 = {
-            q: `"${name.trim()}" ${set ? `set:${set}` : ''}`,
+            q: `"${name.trim()}" unique:cards ${options.set ? `set:${options.set}` : ''}`,
             include_multilingual: true,
             format: 'json',
           };
@@ -65,11 +107,13 @@ function matchCards(message) {
               const result = JSON.parse(resultJSON);
               if (result.total_cards === 1) {
                 saveStats('matchs', 1);
-                return parseCardObject(JSON.parse(result.data[0]));
+                return getFrameVersionOfCard(JSON.parse(result.data[0]), options);
               }
               throw new Error(`${result.total_cards} cards found in another language`);
             })
-            .catch(() => {
+            .then((cardData) => parseCardObject(cardData))
+            .catch((err) => {
+              console.log(err);
               console.log('No unique card found in another language');
               return [];
             });
