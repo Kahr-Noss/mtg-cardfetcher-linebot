@@ -24,7 +24,7 @@
     "botbuilder": "^3.15.0",
     "botbuilder-line": "0.0.2",
     "dotenv": "^6.2.0",
-    "express": "^4.16.3",
+    "express": "^4.17.3",
     "https": "^1.0.0",
     "linebot": "^1.5.1",
     "node-cron": "^2.0.3",
