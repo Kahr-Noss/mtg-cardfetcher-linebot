@@ -3,6 +3,16 @@ const querystring = require('querystring');
 
 const { saveStats } = require('./save-stats');
 
+function callScryfallAPI(url) {
+  return request.get({
+    url,
+    headers: {
+      'User-Agent': 'Linebot/1.0',
+      Accept: '*/*',
+    },
+  });
+}
+
 function parseCardObject(card) {
   // get the two faces of the card if it's a double faced card
   const cardFacesList = card.card_faces ? card.card_faces.filter((c) => c.image_uris) : [];
@@ -12,7 +22,7 @@ function parseCardObject(card) {
   return Promise.all((card.all_parts || [])
   // remove present card, tokens and emblems from the list
     .filter((c) => c.id !== card.id && c.component !== 'token' && !c.type_line.match(/^Emblem/))
-    .map((c) => request.get(c.uri).then((relatedCardJSON) => JSON.parse(relatedCardJSON))))
+    .map((c) => callScryfallAPI(c.uri).then((relatedCardJSON) => JSON.parse(relatedCardJSON))))
     .then((relatedCards) => [...cardList, ...relatedCards].map((c) => ({
       imageUrl: c.image_uris.normal,
       name: c.name,
@@ -36,7 +46,7 @@ function getFrameVersionOfCard(card, options) {
     format: 'json',
   };
 
-  return request.get(`https://api.scryfall.com/cards/search?${querystring.stringify(search)}`)
+  return callScryfallAPI(`https://api.scryfall.com/cards/search?${querystring.stringify(search)}`)
     .then((resultJSON) => {
       const result = JSON.parse(resultJSON);
       if (result.total_cards !== 0) {
@@ -86,7 +96,7 @@ function matchCards(message) {
         format: 'json',
         set: options.set ? options.set.trim() : '',
       };
-      return request.get(`https://api.scryfall.com/cards/named?${querystring.stringify(search)}`)
+      return callScryfallAPI(`https://api.scryfall.com/cards/named?${querystring.stringify(search)}`)
         .then((cardDataJSON) => {
           saveStats('matchs', 1);
           return getFrameVersionOfCard(JSON.parse(cardDataJSON), options);
@@ -102,7 +112,7 @@ function matchCards(message) {
             include_multilingual: true,
             format: 'json',
           };
-          return request.get(`https://api.scryfall.com/cards/search?${querystring.stringify(search2)}`)
+          return callScryfallAPI(`https://api.scryfall.com/cards/search?${querystring.stringify(search2)}`)
             .then((resultJSON) => {
               const result = JSON.parse(resultJSON);
               if (result.total_cards === 1) {
